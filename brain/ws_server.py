@@ -60,6 +60,11 @@ def enqueue_stop() -> None:
         _loop.call_soon_threadsafe(outgoing_queue.put_nowait, "STOP")
 
 
+def enqueue_state(state: str) -> None:
+    if _loop:
+        _loop.call_soon_threadsafe(outgoing_queue.put_nowait, f"STATE:{state}")
+
+
 def clear_queue() -> None:
     while not audio_queue.empty():
         try:

@@ -1,6 +1,6 @@
 # ISSUE-012 — Ekran LCD Round Display
 
-**Status:** planned
+**Status:** done
 **Epic:** EPIC-2
 
 ## Cel

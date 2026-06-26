@@ -10,6 +10,7 @@
       "Bash(git branch*)",
       "Bash(git commit*)",
       "Bash(git push*)",
+      "Bash(cd * && git *)",
       "Bash(wc -l*)",
       "Bash(grep*)",
       "Bash(find*)",

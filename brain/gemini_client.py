@@ -4,7 +4,7 @@ from google.genai import types
 
 from config import GEMINI_API_KEY, GEMINI_MODEL, SYSTEM_PROMPT
 from audio import player_open, player_write, player_stop, player_abort
-from ws_server import audio_queue, clear_queue
+from ws_server import audio_queue, clear_queue, enqueue_state
 
 _client = genai.Client(
     api_key=GEMINI_API_KEY,
@@ -35,6 +35,7 @@ async def _receive_audio(session) -> None:
     loop = asyncio.get_event_loop()
     while True:
         stream_open = False
+        enqueue_state("listen")
         async for response in session.receive():
             if not response.server_content:
                 continue
@@ -42,6 +43,7 @@ async def _receive_audio(session) -> None:
             if sc.interrupted:
                 await loop.run_in_executor(None, player_abort)
                 clear_queue()
+                enqueue_state("listen")
                 stream_open = False
                 break
             if sc.model_turn:
@@ -49,11 +51,13 @@ async def _receive_audio(session) -> None:
                     if part.inline_data:
                         if not stream_open:
                             await loop.run_in_executor(None, player_open)
+                            enqueue_state("speak")
                             stream_open = True
                         await loop.run_in_executor(None, player_write, part.inline_data.data)
             if sc.turn_complete:
                 await loop.run_in_executor(None, player_stop)
                 clear_queue()
+                enqueue_state("listen")
                 stream_open = False
 
 
