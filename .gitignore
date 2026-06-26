@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# VS Code
+.vscode/
+
+# PlatformIO
+firmware/.pio/
+
+# Secrets
+firmware/include/secrets.h
