@@ -11,15 +11,20 @@ Faza 1 — Hardware Mordo (ESP32-S3)
 - ISSUE-009: Pełna pętla audio — ESP32 mic → brain → Gemini → głośnik PC, multi-turn działa
 - ISSUE-010: Streaming playback + barge-in + VAD 400ms/200ms — działa
 
-## EPIC-2 status
-Wszystkie issue zamknięte. Mordo słyszy przez ESP32, odpowiada przez Gemini, rozmawia wielokrotnie, można go przerywać.
+## ISSUE-011 — w trakcie testowania
+Głośnik MAX98357A podłączony (BCLK=D8, LRC=D7, DIN=D6).
+Firmware i brain gotowe — czeka na test manualny:
+- `python brain/test_speaker.py` → ESP32 podłącza się, gra gamę w pętli (test czy głośnik gra czysto)
+- `python brain/main.py` → pełna pętla z Gemini przez wbudowany głośnik ESP32
+
+Implementacja:
+- firmware: I2S_NUM_1 dla głośnika, ring buffer 8KB, mic timeout 10ms
+- brain/ws_server.py: outgoing_queue, sender task, enqueue_audio/stop
+- brain/audio.py: zastąpiono sounddevice wysyłaniem przez WebSocket do ESP32
 
 ## Repo
 https://github.com/Quamca/hej-mordo (publiczne)
 
-## Co następne
-- Do ustalenia z Igorem: następny epic / faza
-- Kandydaci: głośnik na ESP32 (MAX98357A), wake word "Hej Mordo", kamera, ekran LCD
-
 ## Ostatnia sesja
-2026-06-26 — ISSUE-010 ukończony: streaming playback (chunki grane natychmiast), barge-in (player_abort na interrupted), VAD skonfigurowany wg wzorca OmniBot. Repo publiczne na GitHubie.
+2026-06-26 — ISSUE-011 zaimplementowany (firmware + brain), test manualny do wykonania.
+Dodano test_speaker.py do szybkiego sprawdzania głośnika bez uruchamiania main.py.
