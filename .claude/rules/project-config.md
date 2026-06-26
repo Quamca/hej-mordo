@@ -33,7 +33,7 @@ applyTo: "**"
 
 - Seeed Xiao ESP32-S3 Sense (wlutowane piny)
 - Kamera OV3660 + taśma FPC 75mm (120°)
-- Wyświetlacz LCD 1.28" okrągły (dotykowy)
+- Wyświetlacz Seeed Round Display for XIAO 1.28" 240×240 IPS (model 104030087) — sterownik GC9A01 (SPI), dotyk CST816S (I2C), wtyczka bezpośrednio na XIAO
 - Wzmacniacz MAX98357A I2S DAC
 - Głośnik 8Ω 2W
 - Akumulator Li-Pol 4000mAh

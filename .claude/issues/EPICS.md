@@ -15,4 +15,5 @@ ESP32-S3 jako terminal sprzętowy: zbiera audio z mikrofonu I2S, wysyła przez W
 - [x] ISSUE-008 WiFi + WebSocket ESP32 ↔ brain — działa, streaming 1024B chunków
 - [x] ISSUE-009 Pełna pętla audio: ESP32 mic → brain → Gemini → brain → głośnik PC — działa, multi-turn
 - [x] ISSUE-010 Latencja i przerywanie: VAD 400ms + streaming playback + barge-in
-- [ ] ISSUE-011 Głośnik ESP32 (MAX98357A I2S DAC) — audio na urządzeniu, redukuje self-interruption, otwiera AEC
+- [ ] ISSUE-011 Głośnik ESP32 (MAX98357A I2S DAC) — wstrzymany, czeka na lutowanie + rozwiązanie konfliktu pinów z ekranem
+- [ ] ISSUE-012 Ekran LCD Round Display 1.28" (GC9A01) — stan Mordo wizualnie
