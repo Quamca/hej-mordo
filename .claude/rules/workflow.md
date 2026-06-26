@@ -17,7 +17,7 @@ Wszystko inne czyta tylko gdy wprost potrzebne.
 ## Orientacja w projekcie
 
 Na początku każdej sesji Claude Code czyta `CURRENT_STATE.md` w katalogu głównym.
-Po każdej sesji aktualizuje go: co zrobiono, co w toku, co następne.
+**Przed zakończeniem każdej sesji** Claude Code MUSI zaktualizować `CURRENT_STATE.md` i zcommitować — nawet jeśli Igor nie przypomni.
 Przy zerwaniu sesji — powiedz "gdzie skończyliśmy" a Claude Code przeczyta plik i wróci do kontekstu.
 
 ```

@@ -23,5 +23,18 @@
       "Bash(git reset*)",
       "Bash(rm -rf*)"
     ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"Czy CURRENT_STATE.md jest aktualny? Jeśli nie — poproś Claude o aktualizację przed zamknięciem sesji.\"}'",
+            "shell": "bash"
+          }
+        ]
+      }
+    ]
   }
 }
