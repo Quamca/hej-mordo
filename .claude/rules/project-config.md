@@ -71,3 +71,14 @@ Zasada: każda faza musi być stabilna zanim zaczyna się następna.
 | OmniBot (nazirlouis) | https://github.com/nazirlouis/OmniBot | Gemini Live API, wake word, rozpoznawanie twarzy, persona, ESP32 — niemal identyczna architektura jak Mordo |
 
 Zasada: referencje służą do nauki i rozwiązywania problemów — nie kopiujemy kodu bez analizy.
+
+### Kiedy sprawdzać OmniBot
+
+Przy nowych issue dotyczących: audio, barge-in, VAD, latencji, Gemini Live protokołu, wake word, rozpoznawania twarzy, osobowości — sprawdź najpierw jak OmniBot to rozwiązał. Często szybciej niż w dokumentacji.
+
+Przydatne pliki:
+- `app/backend/gemini_live_session.py` — logika sesji Gemini Live
+- `app/backend/wake_listen.py` — VAD, wykrywanie mowy
+
+Znane rozwiązania zaczerpnięte z OmniBot:
+- VAD config: `prefix_padding_ms=200, silence_duration_ms=400`

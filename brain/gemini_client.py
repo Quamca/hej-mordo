@@ -3,7 +3,7 @@ from google import genai
 from google.genai import types
 
 from config import GEMINI_API_KEY, GEMINI_MODEL, SYSTEM_PROMPT
-from audio import play_audio
+from audio import player_open, player_write, player_stop, player_abort
 from ws_server import audio_queue, clear_queue
 
 _client = genai.Client(
@@ -14,38 +14,47 @@ _client = genai.Client(
 _live_config = types.LiveConnectConfig(
     response_modalities=["AUDIO"],
     system_instruction=SYSTEM_PROMPT,
+    realtime_input_config=types.RealtimeInputConfig(
+        automatic_activity_detection=types.AutomaticActivityDetection(
+            prefix_padding_ms=200,
+            silence_duration_ms=400,
+        )
+    ),
 )
-
-_is_playing = False
 
 
 async def _send_audio(session) -> None:
     while True:
         chunk = await audio_queue.get()
-        if not _is_playing:
-            await session.send_realtime_input(
-                audio=types.Blob(data=chunk, mime_type="audio/pcm;rate=16000")
-            )
+        await session.send_realtime_input(
+            audio=types.Blob(data=chunk, mime_type="audio/pcm;rate=16000")
+        )
 
 
 async def _receive_audio(session) -> None:
-    global _is_playing
     loop = asyncio.get_event_loop()
     while True:
-        audio_buffer = bytearray()
+        stream_open = False
         async for response in session.receive():
-            if response.server_content:
-                if response.server_content.model_turn:
-                    for part in response.server_content.model_turn.parts:
-                        if part.inline_data:
-                            audio_buffer.extend(part.inline_data.data)
-                if response.server_content.turn_complete:
-                    if audio_buffer:
-                        _is_playing = True
-                        await loop.run_in_executor(None, play_audio, bytes(audio_buffer))
-                        _is_playing = False
-                        audio_buffer = bytearray()
-                        clear_queue()
+            if not response.server_content:
+                continue
+            sc = response.server_content
+            if sc.interrupted:
+                await loop.run_in_executor(None, player_abort)
+                clear_queue()
+                stream_open = False
+                break
+            if sc.model_turn:
+                for part in sc.model_turn.parts:
+                    if part.inline_data:
+                        if not stream_open:
+                            await loop.run_in_executor(None, player_open)
+                            stream_open = True
+                        await loop.run_in_executor(None, player_write, part.inline_data.data)
+            if sc.turn_complete:
+                await loop.run_in_executor(None, player_stop)
+                clear_queue()
+                stream_open = False
 
 
 async def run() -> None:
