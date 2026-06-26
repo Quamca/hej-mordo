@@ -34,17 +34,18 @@ static void ring_write(const uint8_t* data, size_t len) {
 
 WebSocketsClient ws;
 static MordoState current_state = MORDO_IDLE;
+static MordoView  active_view   = VIEW_MAIN;
 
 void onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
   if (type == WStype_CONNECTED) {
     Serial.println("[WS] polaczono");
-    drawStatus(MORDO_LISTEN);
     current_state = MORDO_LISTEN;
+    if (active_view == VIEW_MAIN) drawStatus(MORDO_LISTEN);
   }
   if (type == WStype_DISCONNECTED) {
     Serial.println("[WS] rozlaczono");
-    drawStatus(MORDO_IDLE);
     current_state = MORDO_IDLE;
+    if (active_view == VIEW_MAIN) drawStatus(MORDO_IDLE);
   }
   if (type == WStype_BIN) {
     ring_write(payload, length);  // bufor audio — speaker wyłączony, dane ignorowane
@@ -55,9 +56,10 @@ void onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
       ring_head = ring_tail = 0;
     } else if (strncmp(msg, "STATE:", 6) == 0) {
       char* state = msg + 6;
-      if      (strcmp(state, "idle")   == 0) { drawStatus(MORDO_IDLE);   current_state = MORDO_IDLE; }
-      else if (strcmp(state, "listen") == 0) { drawStatus(MORDO_LISTEN); current_state = MORDO_LISTEN; }
-      else if (strcmp(state, "speak")  == 0) { drawStatus(MORDO_SPEAK);  current_state = MORDO_SPEAK; }
+      if      (strcmp(state, "idle")   == 0) current_state = MORDO_IDLE;
+      else if (strcmp(state, "listen") == 0) current_state = MORDO_LISTEN;
+      else if (strcmp(state, "speak")  == 0) current_state = MORDO_SPEAK;
+      if (active_view == VIEW_MAIN) drawStatus(current_state);  // guard: nie nadpisuj widoku WiFi
     }
   }
 }
@@ -99,7 +101,6 @@ void setup() {
   Serial.println("[MIC] gotowy, ekran aktywny");
 }
 
-static int touch_tick = 0;
 
 void loop() {
   ws.loop();
@@ -111,11 +112,12 @@ void loop() {
   if (bytes_read > 0 && ws.isConnected())
     ws.sendBIN((uint8_t*)mic_buf, bytes_read);
 
-  // Dotyk — sprawdzaj co ~100ms (co 10 iteracji przy ~10ms timeout)
-  if (++touch_tick >= 10) {
-    touch_tick = 0;
-    int tx, ty;
-    if (touchRead(tx, ty))
-      Serial.printf("[TOUCH] x=%d y=%d\n", tx, ty);
+  Gesture g = gestureRead();
+  if (g == GESTURE_SWIPE_RIGHT && active_view == VIEW_MAIN) {
+    active_view = VIEW_WIFI;
+    drawWifiView(WiFi.RSSI(), WiFi.SSID().c_str());
+  } else if (g == GESTURE_SWIPE_LEFT && active_view == VIEW_WIFI) {
+    active_view = VIEW_MAIN;
+    drawStatus(current_state);
   }
 }
