@@ -1,14 +1,8 @@
 # Epics
 
-## EPIC-1 — Software Mordo Faza 0 [in-progress, zawieszone]
+## EPIC-1 — Software Mordo Faza 0 [anulowany]
 
-Mordo działa na laptopie: widzi twarz Igora przez kamerę, słyszy go przez mikrofon, odpowiada głosem przez głośnik — wszystko przez Gemini Flash Live API.
-
-- [ ] ISSUE-001 Gemini Live API + audio + system prompt (zawieszone — VAD niestabilny)
-- [ ] ISSUE-002 Kamera
-- [ ] ISSUE-003 Wake word "Hej Mordo"
-- [ ] ISSUE-004 Rozpoznawanie twarzy Igora
-- [ ] ISSUE-005 Symulacja okrągłego ekranu w przeglądarce
+Pominięty — części ESP32 dotarły wcześniej niż planowano, przechodzimy bezpośrednio do hardware.
 
 ---
 

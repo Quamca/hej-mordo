@@ -53,7 +53,7 @@ Przekroczenie = podziel na moduły przed kontynuacją.
 - Push po teście manualnym
 - Merge do `main` po "działa" od Igora
 
-**Nigdy nie commituj bez "commit now" od Igora.**
+**Git: patrz `git-autonomy.md` — push automatycznie po przejętym teście.** # Zmieniono: 202606261028
 
 ## Fazy — co wolno robić w danej fazie
 
