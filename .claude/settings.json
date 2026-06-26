@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Write({project}/**)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git branch*)",
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(wc -l*)",
+      "Bash(grep*)",
+      "Bash(find*)",
+      "Bash(python*)",
+      "Bash(pip*)",
+      "Bash(pytest*)"
+    ],
+    "deny": [
+      "Bash(git merge*)",
+      "Bash(git checkout*)",
+      "Bash(git reset*)",
+      "Bash(rm -rf*)"
+    ]
+  }
+}
