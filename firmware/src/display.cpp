@@ -12,7 +12,7 @@ public:
     {
       auto cfg = _bus.config();
       cfg.spi_host   = SPI2_HOST;
-      cfg.freq_write = 80000000;
+      cfg.freq_write = 40000000;
       cfg.pin_sclk   = 7;   // D8
       cfg.pin_mosi   = 9;   // D10
       cfg.pin_miso   = 8;   // D9
@@ -43,6 +43,8 @@ static unsigned long last_touch_ms = 0;
 void IRAM_ATTR touchISR() { touch_flag = true; }
 
 void displayInit() {
+  pinMode(2, OUTPUT);
+  digitalWrite(2, HIGH);  // Display CS — wyłącz GC9A01 z magistrali zanim SPI startuje
   pinMode(3, OUTPUT);
   digitalWrite(3, HIGH);  // SD_CS — wyłącz SD z magistrali SPI
   delay(10);

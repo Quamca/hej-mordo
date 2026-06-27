@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <WebSocketsClient.h>
 #include "driver/i2s.h"
+#include "esp_system.h"
 #include "secrets.h"
 #include "display.h"
 #include "camera.h"
@@ -86,8 +87,10 @@ void setupMic() {
 }
 
 void setup() {
+  pinMode(2, OUTPUT); digitalWrite(2, HIGH);  // Display CS — przed wszystkim, żeby SPI był czysty
+  pinMode(3, OUTPUT); digitalWrite(3, HIGH);  // SD CS — SD nie śmieciuje magistrali przy cold boot
+  delay(200);
   Serial.begin(115200);
-
   displayInit();  // ekran init przed WiFi — pokazuje szary okrąg podczas łączenia
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);

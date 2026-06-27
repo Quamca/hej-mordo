@@ -21,36 +21,35 @@ Implementacja gotowa (firmware + brain + test_speaker.py).
 Problem: luzy na stykach MAX98357A — audio I2S wrażliwe na przerwy.
 Wrócimy gdy Igor przylutuje moduł. Przy lutowaniu zmienić piny głośnika (konflikt z ekranem na D7/D8).
 
-## AKTUALNY BUG — ekran czarny po power cycle
+## AKTUALNY BUG — ekran czarny po cold boot (USB power cycle)
 
 ### Symptom
 Po odłączeniu i ponownym podłączeniu USB ekran jest czarny (podświetlony, ale bez treści).
-Firmware działa poprawnie — Serial Monitor pokazuje komendy rysowania. SPI do GC9A01 nie dociera.
+Po warm reset (upload przez PlatformIO) ekran działa — GC9A01 zostaje zasilony podczas uploadu.
 
-### Co już próbowaliśmy (bez efektu)
+### Diagnoza (potwierdzona)
+GC9A01 na Seeed Round Display for XIAO **nie ma NRST podłączonego do żadnego GPIO XIAO**.
+Potwierdzenie: Zephyr device tree overlay dla tego shielda nie zawiera `reset-gpios`.
+Reset sprzętowy GC9A01 odbywa się wyłącznie przez RC circuit lub pin RST XIAO (nie programowalny).
+
+Dodatkowe info: D6 (GPIO43, TX) = backlight — Zephyr wyłącza Serial na tym boardzie ze względu na konflikt.
+
+### Co próbowaliśmy (bez efektu na cold boot)
 - Różne ustawienia pin_rst (-1, 43)
-- delay() przed displayInit (50ms, 200ms, 300ms)
-- BOARD_HAS_PSRAM dodane do test_display env
+- delay() przed displayInit: 50ms, 200ms, 300ms, 5000ms
+- BOARD_HAS_PSRAM
 - SD_CS (GPIO3) HIGH przed tft.init()
-- Fizyczne odpięcie i wpięcie modułu Round Display
+- Display CS (GPIO2) HIGH przed tft.init()
+- CS piny HIGH jako pierwsze linie setup() (przed delay)
+- double-reset: esp_restart() przy ESP_RST_POWERON
+- SPI freq 40MHz zamiast 80MHz
+- Fizyczne odpięcie i wpięcie Round Display
 - Upload zarówno test_display (minimalny) jak i głównego firmware
 
-### Konfiguracja SPI (display.cpp i test_display.cpp)
-- SCK=7, MOSI=9, MISO=8, DC=4, CS=2, RST=-1
-- SPI2_HOST, 40–80 MHz
-- Ekran: Panel_GC9A01, 240×240, invertDisplay(true)
-- SD_CS=3 (Round Display ma SD na tym samym SPI)
-
-### Co wiadomo
-- Backlight (GPIO43) działa — ekran jest podświetlony
-- Swipe/touch (CHSC6X GPIO44) działał przed bugiem
-- MAX98357A fizycznie odłączony od początku
-- Kamera OV3660 na XIAO Sense — piny nie kolidują z SPI
-
-### Hipotezy do sprawdzenia w następnej sesji
-1. GC9A01 NRST — sprawdzić schemat Seeed Round Display (104030087) do którego pinu XIAO jest podłączony NRST kontrolera LCD. Jeśli do XIAO RST, to przy USB reconnect powinien resetować się sam.
-2. Oficjalny przykład Seeed — sprawdzić jak Seeed inicjalizuje GC9A01 w swoich przykładach (repozytorium Seeed_Arduino_RoundDisplay)
-3. Sprawdzić czy problem nie jest w tym że kamera (cameraInit) robi coś z SPI2 lub GPIO — przetestować test_display bez cameraInit
+### Rozwiązania do wyboru
+1. **Akumulator** — Li-Pol podłączony do JST PH 1.25mm na XIAO; GC9A01 nie traci zasilania przy USB reconnect → cold boot znika. Igor ma 4000mAh w planie, trzeba sprawdzić złącze.
+2. **Pull-up rezystor** — 10kΩ między GPIO2 (D1) a 3.3V; utrzymuje Display CS HIGH podczas bootloadera zanim setup() startuje. Proste lutowanie.
+3. **Upload** — naprawia jeśli SPI nie było wcześniej zepsute; nie gwarantowane po każdym cold boot.
 
 ## Co teraz (po naprawie ekranu)
 ISSUE-018 — Gemini odpala się gdy Mordo rozpozna Igora, dostaje klatki kamery (wizja), wita go tekstem w terminalu.
@@ -59,4 +58,5 @@ ISSUE-018 — Gemini odpala się gdy Mordo rozpozna Igora, dostaje klatki kamery
 https://github.com/Quamca/hej-mordo (publiczne)
 
 ## Ostatnia sesja
-2026-06-27 — cały dzień na debug ekranu. Bug nie rozwiązany. Następna sesja: sprawdzić schemat NRST + oficjalny przykład Seeed.
+2026-06-28 — cały dzień na debug cold boot ekranu. Bug nie rozwiązany softwareowo.
+Diagnoza potwierdzona: brak GPIO dla NRST GC9A01. Następna sesja: wybrać rozwiązanie (akumulator / pull-up / zaakceptować).
