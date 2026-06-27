@@ -22,10 +22,10 @@ Problem: luzy na stykach MAX98357A — audio I2S wrażliwe na przerwy.
 Wrócimy gdy Igor przylutuje moduł. Przy lutowaniu zmienić piny głośnika (konflikt z ekranem na D7/D8).
 
 ## Co teraz
-ISSUE-016 zamknięty. Następny: ISSUE-017 — przycisk na ekranie kamery do robienia zdjęć referencyjnych z walidacją twarzy (wymaga odczytu Y z dotyku).
+ISSUE-016 zamknięty. Następny: ISSUE-018 — Gemini odpala się gdy Mordo rozpozna Igora, dostaje klatki kamery (wizja), wita go tekstem w terminalu (dopóki głośnik nie zlutowany).
 
 ## Repo
 https://github.com/Quamca/hej-mordo (publiczne)
 
 ## Ostatnia sesja
-2026-06-27 — ISSUE-014/015/016 done. Kamera streamuje do brain, rozpoznaje Igora, widok kamery na LCD z carousel swipe. Upload firmware: kill monitor + pio CLI (2 osobne wywołania Bash).
+2026-06-27 — ISSUE-014/015/016 done. Kamera streamuje do brain, rozpoznaje Igora (InsightFace), widok kamery na LCD z carousel swipe (WIFI←MAIN→CAMERA). Upload firmware: kill monitor + pio CLI w 2 osobnych Bash calls. ISSUE-017 (przycisk zdjęć) odpinamy na później — ISSUE-018 (Gemini trigger) ważniejszy.
