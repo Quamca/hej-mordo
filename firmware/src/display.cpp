@@ -23,7 +23,7 @@ public:
     {
       auto cfg = _panel.config();
       cfg.pin_cs      = 2;  // D1
-      cfg.pin_rst     = -1;
+      cfg.pin_rst     = 43; // D6 — hardware reset GC9A01
       cfg.panel_width  = 240;
       cfg.panel_height = 240;
       _panel.config(cfg);
