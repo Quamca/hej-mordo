@@ -16,4 +16,7 @@ ESP32-S3 jako terminal sprzętowy: zbiera audio z mikrofonu I2S, wysyła przez W
 - [x] ISSUE-009 Pełna pętla audio: ESP32 mic → brain → Gemini → brain → głośnik PC — działa, multi-turn
 - [x] ISSUE-010 Latencja i przerywanie: VAD 400ms + streaming playback + barge-in
 - [ ] ISSUE-011 Głośnik ESP32 (MAX98357A I2S DAC) — wstrzymany, czeka na lutowanie + rozwiązanie konfliktu pinów z ekranem
-- [ ] ISSUE-012 Ekran LCD Round Display 1.28" (GC9A01) — stan Mordo wizualnie
+- [x] ISSUE-012 Ekran LCD Round Display 1.28" (GC9A01) — stan Mordo wizualnie
+- [x] ISSUE-013 Menu swipe — widok WiFi z siłą sygnału RSSI, interrupt-driven CHSC6X
+- [ ] ISSUE-014 Kamera ESP32 — inicjalizacja OV3660, stream JPEG do brain
+- [ ] ISSUE-015 Rozpoznawanie twarzy Igora w brain → "siema mordo" na ekranie
