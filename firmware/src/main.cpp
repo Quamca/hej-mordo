@@ -105,7 +105,8 @@ void setup() {
 }
 
 
-static unsigned long last_cam_ms = 0;
+static unsigned long last_cam_ms  = 0;
+static unsigned long last_lcd_ms  = 0;
 static const uint8_t CAM_HEADER[4] = {'C', 'A', 'M', 0};
 
 void loop() {
@@ -120,28 +121,38 @@ void loop() {
 
   // Kamera — jedna klatka JPEG co 200ms (5 fps)
   unsigned long now = millis();
-  if (ws.isConnected() && now - last_cam_ms >= 200) {
+  if (now - last_cam_ms >= 200) {
     last_cam_ms = now;
     uint8_t* jpg; size_t jpg_len;
     if (cameraCapture(&jpg, &jpg_len)) {
-      // Wyślij: 4B nagłówek CAM\0 + dane JPEG
-      size_t total = 4 + jpg_len;
-      uint8_t* pkt = (uint8_t*)malloc(total);
-      if (pkt) {
-        memcpy(pkt, CAM_HEADER, 4);
-        memcpy(pkt + 4, jpg, jpg_len);
-        ws.sendBIN(pkt, total);
-        free(pkt);
+      if (ws.isConnected()) {
+        size_t total = 4 + jpg_len;
+        uint8_t* pkt = (uint8_t*)malloc(total);
+        if (pkt) {
+          memcpy(pkt, CAM_HEADER, 4);
+          memcpy(pkt + 4, jpg, jpg_len);
+          ws.sendBIN(pkt, total);
+          free(pkt);
+        }
+      }
+      if (active_view == VIEW_CAMERA && now - last_lcd_ms >= 500) {
+        last_lcd_ms = now;
+        drawCameraFrame(jpg, jpg_len);
       }
       cameraFree(jpg);
     }
   }
 
   Gesture g = gestureRead();
-  if (g == GESTURE_SWIPE_RIGHT && active_view == VIEW_MAIN) {
+  if (g == GESTURE_SWIPE_LEFT && active_view == VIEW_MAIN) {
     active_view = VIEW_WIFI;
     drawWifiView(WiFi.RSSI(), WiFi.SSID().c_str());
-  } else if (g == GESTURE_SWIPE_LEFT && active_view == VIEW_WIFI) {
+  } else if (g == GESTURE_SWIPE_RIGHT && active_view == VIEW_WIFI) {
+    active_view = VIEW_MAIN;
+    drawStatus(current_state);
+  } else if (g == GESTURE_SWIPE_RIGHT && active_view == VIEW_MAIN) {
+    active_view = VIEW_CAMERA;
+  } else if (g == GESTURE_SWIPE_LEFT && active_view == VIEW_CAMERA) {
     active_view = VIEW_MAIN;
     drawStatus(current_state);
   }
