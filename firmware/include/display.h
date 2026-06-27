@@ -1,6 +1,6 @@
 #pragma once
 
-enum MordoState  { MORDO_IDLE, MORDO_LISTEN, MORDO_SPEAK };
+enum MordoState  { MORDO_IDLE, MORDO_LISTEN, MORDO_SPEAK, MORDO_FACE };
 enum MordoView   { VIEW_MAIN, VIEW_WIFI };
 enum Gesture     { GESTURE_NONE, GESTURE_SWIPE_LEFT, GESTURE_SWIPE_RIGHT };
 

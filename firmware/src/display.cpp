@@ -57,7 +57,9 @@ void drawStatus(MordoState state) {
     { 0x444444, "..."     },  // IDLE
     { 0x0055FF, "slucham" },  // LISTEN
     { 0x00AA44, "mowie"   },  // SPEAK
+    { 0x00BB44, "siema"   },  // FACE
   };
+  if ((int)state >= 4) state = MORDO_IDLE;
   tft.fillScreen(TFT_BLACK);
   tft.fillCircle(120, 120, 108, cfg[state].bg);
   tft.setTextColor(TFT_WHITE, cfg[state].bg);

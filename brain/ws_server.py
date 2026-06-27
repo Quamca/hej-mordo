@@ -14,6 +14,7 @@ CAM_HEADER = b'CAM\x00'
 audio_queue: asyncio.Queue = asyncio.Queue()
 frame_queue: asyncio.Queue = asyncio.Queue(maxsize=2)  # tylko najnowsze klatki
 outgoing_queue: asyncio.Queue = asyncio.Queue()
+frame_callbacks: list = []  # rejestrowane przez moduły (np. face.py)
 _debug_frame_saved = False
 _loop: asyncio.AbstractEventLoop | None = None
 
@@ -55,7 +56,8 @@ async def handle(websocket):
 
 def _handle_frame(data: bytes) -> None:
     global _debug_frame_saved
-    print(f"[CAM] frame received, size={len(data)} B")
+    for cb in frame_callbacks:
+        cb(data)
     if not _debug_frame_saved:
         try:
             path = os.path.join(_BRAIN_DIR, "frame_debug.jpg")

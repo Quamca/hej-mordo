@@ -2,7 +2,8 @@ import asyncio
 
 from config import GEMINI_API_KEY
 from gemini_client import run
-from ws_server import start as start_ws
+from ws_server import start as start_ws, frame_callbacks
+import face
 
 
 def main() -> None:
@@ -13,6 +14,9 @@ def main() -> None:
     print("Mordo startuje... (Ctrl+C żeby zatrzymać)")
 
     async def _main():
+        loop = asyncio.get_event_loop()
+        frame_callbacks.append(face.put_frame)
+        face.start(loop)
         await asyncio.gather(start_ws(), run())
 
     try:

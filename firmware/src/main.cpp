@@ -60,6 +60,7 @@ void onWsEvent(WStype_t type, uint8_t* payload, size_t length) {
       if      (strcmp(state, "idle")   == 0) current_state = MORDO_IDLE;
       else if (strcmp(state, "listen") == 0) current_state = MORDO_LISTEN;
       else if (strcmp(state, "speak")  == 0) current_state = MORDO_SPEAK;
+      else if (strcmp(state, "face")   == 0) current_state = MORDO_FACE;
       if (active_view == VIEW_MAIN) drawStatus(current_state);  // guard: nie nadpisuj widoku WiFi
     }
   }
