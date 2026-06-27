@@ -13,6 +13,8 @@ Faza 1 — Hardware Mordo (ESP32-S3)
 - ISSUE-012: Ekran LCD Round Display — GC9A01 + LovyanGFX, stany IDLE/LISTEN/SPEAK wyświetlane poprawnie
 - ISSUE-013: Menu swipe — widok WiFi z siłą sygnału (RSSI kreski) i SSID. Swipe right otwiera, swipe left wraca. Interrupt-driven (CHSC6X FALLING edge).
 - ISSUE-014: Kamera ESP32 OV3660 — stream JPEG ~5fps do brain przez WebSocket (CAM\0 header). Działa.
+- ISSUE-015: Rozpoznawanie twarzy Igora (InsightFace buffalo_sc) — ekran "siema" na zielonym tle. Działa.
+- ISSUE-016: Widok kamery na LCD — carousel WIFI←MAIN→CAMERA swipe, obraz 5fps na ekranie. Działa.
 
 ## ISSUE-011 — wstrzymany (czeka na lutowanie)
 Implementacja gotowa (firmware + brain + test_speaker.py).
@@ -20,10 +22,10 @@ Problem: luzy na stykach MAX98357A — audio I2S wrażliwe na przerwy.
 Wrócimy gdy Igor przylutuje moduł. Przy lutowaniu zmienić piny głośnika (konflikt z ekranem na D7/D8).
 
 ## Co teraz
-ISSUE-014 zamknięty. Następny: ISSUE-015 — rozpoznawanie twarzy Igora w brain + "siema mordo" na ekranie.
+ISSUE-016 zamknięty. Następny: ISSUE-017 — przycisk na ekranie kamery do robienia zdjęć referencyjnych z walidacją twarzy (wymaga odczytu Y z dotyku).
 
 ## Repo
 https://github.com/Quamca/hej-mordo (publiczne)
 
 ## Ostatnia sesja
-2026-06-27 — ISSUE-014: kamera ESP32 streamuje JPEG do brain, działa. ISSUE-015 następny (live preview + face_recognition).
+2026-06-27 — ISSUE-014/015/016 done. Kamera streamuje do brain, rozpoznaje Igora, widok kamery na LCD z carousel swipe. Upload firmware: kill monitor + pio CLI (2 osobne wywołania Bash).
