@@ -20,10 +20,9 @@ applyTo: "**"
 - Nie kopiuj wzorców z grAlfabet bez pytania
 - Firmware: używaj wyłącznie PlatformIO — nie instaluj bibliotek przez Arduino Library Manager, zawsze przez `lib_deps` w `platformio.ini`
 - Firmware build+upload: zawsze wykonuj w tej kolejności bez pytania Igora:
-  1. Zamknij Serial Monitor: `powershell -Command "Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object { \$_.CommandLine -like '*monitor*' } | ForEach-Object { Stop-Process -Id \$_.ProcessId -Force -ErrorAction SilentlyContinue }; exit 0"`
-  2. Poczekaj 1s: `sleep 1`
-  3. Upload: `$USERPROFILE/.platformio/penv/Scripts/pio.exe run --target upload` w katalogu `firmware/`
-  Jeśli po tym nadal błąd portu — wtedy i tylko wtedy powiedz Igorowi żeby kliknął Upload w VS Code.
+  1. Zamknij Serial Monitor (ignoruj błędy): `powershell -Command "Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object { \$_.CommandLine -like '*monitor*' } | ForEach-Object { Stop-Process -Id \$_.ProcessId -Force -ErrorAction SilentlyContinue }"` — wywołaj OSOBNO, nie łącz przez `&&` (zwraca 255 gdy nic nie ma do zabicia)
+  2. Upload OSOBNYM wywołaniem Bash: `$USERPROFILE/.platformio/penv/Scripts/pio.exe run --target upload` w katalogu `firmware/`
+  Jeśli nadal błąd portu — wtedy i tylko wtedy powiedz Igorowi żeby kliknął Upload w VS Code.
 
 ## Zasada aktualizacji
 

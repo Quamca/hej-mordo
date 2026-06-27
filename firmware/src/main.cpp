@@ -152,6 +152,7 @@ void loop() {
     drawStatus(current_state);
   } else if (g == GESTURE_SWIPE_RIGHT && active_view == VIEW_MAIN) {
     active_view = VIEW_CAMERA;
+    clearScreen();
   } else if (g == GESTURE_SWIPE_LEFT && active_view == VIEW_CAMERA) {
     active_view = VIEW_MAIN;
     drawStatus(current_state);

@@ -8,4 +8,5 @@ void displayInit();
 void drawStatus(MordoState state);
 void drawWifiView(int rssi, const char* ssid);
 void drawCameraFrame(const uint8_t* jpg, size_t len);
+void clearScreen();
 Gesture gestureRead();

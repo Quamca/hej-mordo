@@ -106,8 +106,11 @@ Gesture gestureRead() {
 }
 
 void drawCameraFrame(const uint8_t* jpg, size_t len) {
-  // Rysuj JPEG wycentrowany: 320x240 → wytnij centrum 240x240 (x offset = -40)
-  tft.drawJpg(jpg, len, -40, 0, 240, 240);
+  tft.drawJpg(jpg, len, -40, 0);  // bez limitu szerokości — ekran sam przycina do 240px
+}
+
+void clearScreen() {
+  tft.fillScreen(TFT_BLACK);
 }
 
 static int rssiToBars(int rssi) {
