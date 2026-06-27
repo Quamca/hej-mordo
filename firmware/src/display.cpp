@@ -23,7 +23,7 @@ public:
     {
       auto cfg = _panel.config();
       cfg.pin_cs      = 2;  // D1
-      cfg.pin_rst     = 43; // D6 — hardware reset GC9A01
+      cfg.pin_rst     = -1;
       cfg.panel_width  = 240;
       cfg.panel_height = 240;
       _panel.config(cfg);
@@ -43,6 +43,9 @@ static unsigned long last_touch_ms = 0;
 void IRAM_ATTR touchISR() { touch_flag = true; }
 
 void displayInit() {
+  pinMode(3, OUTPUT);
+  digitalWrite(3, HIGH);  // SD_CS — wyłącz SD z magistrali SPI
+  delay(10);
   tft.init();
   tft.invertDisplay(true);
   tft.setRotation(0);
