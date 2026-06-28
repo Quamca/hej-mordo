@@ -22,10 +22,32 @@ Problem: luzy na stykach MAX98357A — audio I2S wrażliwe na przerwy.
 Wrócimy gdy Igor przylutuje moduł. Przy lutowaniu zmienić piny głośnika (konflikt z ekranem na D7/D8).
 
 ## Co teraz
-ISSUE-018 — Gemini odpala się gdy Mordo rozpozna Igora, dostaje klatki kamery (wizja), wita go tekstem w terminalu.
+DEBUG ekranu — ekran świeci czarne tło (backlight ON) ale nie wyświetla nic po cold boot.
+
+### Stan debugowania (2026-06-28, popołudnie)
+Objaw: ekran podświetlony ale czarny. Raz zadziałał poprawnie, po reconnect znów czarny.
+Hipotezy zidentyfikowane:
+- `pin_rst = -1` w LovyanGFX — GC9A01 bez hardware resetu, może być w losowym stanie po cold boot
+- `cameraInit()` w main.cpp wywoływana PO `displayInit()` — może przerekonfigurować SPI/DMA
+- Pin 43 = backlight (nie reset GC9A01 jak mylnie opisano w commit `eaf5a92`)
+- `display.cpp` nie ma `pinMode(43, OUTPUT)` — backlight trzyma UART TX (działa ale niezawodnie)
+
+**Następny krok: Krok 2 z planu** — wgraj `test_display` env (izolowany test bez kamery/WiFi/swipe):
+```
+pio run -e test_display --target upload
+```
+Build OK (340KB), ale Igor odłączył urządzenie przed uploadem — stąd błąd COM3.
+Po powrocie: podłącz ESP32, wgraj `test_display` w VS Code (env: test_display), sprawdź czy ekran pokazuje kolory.
+
+Plik z planem debugowania: `TEMP-debug-ekran.md` (usunąć po zakończeniu).
+
+## ISSUE-011 — wstrzymany (czeka na lutowanie)
+Implementacja gotowa (firmware + brain + test_speaker.py).
+Problem: luzy na stykach MAX98357A — audio I2S wrażliwe na przerwy.
+Wrócimy gdy Igor przylutuje moduł. Przy lutowaniu zmienić piny głośnika (konflikt z ekranem na D7/D8).
 
 ## Repo
 https://github.com/Quamca/hej-mordo (publiczne)
 
 ## Ostatnia sesja
-2026-06-28 — bug cold boot ekranu naprawiony: downgrade platformy do `espressif32 @ 6.7.0` (Arduino Core 2.0.16). ESP32 Core 3.x miał błąd taktowania SPI przy cold boot na XIAO + Round Display. Jedna linia w platformio.ini rozwiązała problem po całym dniu debugowania.
+2026-06-28 — debug ekranu (cold boot czarny). Poprzednia sesja: downgrade espressif32 @ 6.7.0 naprawił cold boot, ale po kolejnym odłączeniu ekran znów nie działa. Diagnoza w toku.
