@@ -1,13 +1,13 @@
 # Epics
 
-## EPIC-1 — Software Mordo Faza 0 [in-progress]
+## EPIC-1 — Software Mordo Faza 0 [done]
 
 Pełna wersja Mordo działająca wyłącznie na laptopie — solidna baza przed powrotem do hardware.
 Mikrofon + głośniki laptopa, kamera laptopa, rozpoznawanie twarzy, auto-trigger Gemini.
 
 - [x] ISSUE-019 PC audio — rozmowa z Gemini przez mic + głośniki laptopa (przeglądarka)
 - [x] ISSUE-020 Kamera laptopa — face recognition + zdjęcie referencyjne z przeglądarki
-- [ ] ISSUE-021 Auto-trigger — rozpoznanie Igora → "Siema mordo" → rozmowa lub dismiss
+- [x] ISSUE-021 Auto-trigger — rozpoznanie Igora → powitanie → rozmowa lub dismiss (30s cooldown)
 
 ---
 

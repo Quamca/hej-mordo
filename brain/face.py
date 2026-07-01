@@ -71,6 +71,11 @@ def _send_face_box(payload: str) -> None:
     enqueue_face_box(payload)
 
 
+def _trigger_gemini() -> None:
+    from gemini_client import signal_igor_present
+    signal_igor_present()
+
+
 def _face_thread(loop) -> None:
     from insightface.app import FaceAnalysis
 
@@ -134,6 +139,7 @@ def _face_thread(loop) -> None:
                         igor_active = True
                         print(f"[FACE] Igor rozpoznany ({sim:.2f})")
                         loop.call_soon_threadsafe(_send_state, "face")
+                        loop.call_soon_threadsafe(_trigger_gemini)
 
         # Timeout — twarz zniknęła >3s
         if igor_active and time.time() - last_igor_ts > _TIMEOUT_S:
