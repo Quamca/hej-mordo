@@ -1,3 +1,4 @@
+
 ---
 title: "ISSUE-014: Kamera ESP32 — inicjalizacja i stream JPEG do brain"
 status: planned

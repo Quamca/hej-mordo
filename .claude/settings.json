@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Read(**)",
-      "Write({project}/**)",
+      "Write(**)",
+      "Edit(**)",
       "Bash(git status)",
       "Bash(git diff*)",
       "Bash(git log*)",
@@ -16,7 +17,9 @@
       "Bash(find*)",
       "Bash(python*)",
       "Bash(pip*)",
-      "Bash(pytest*)"
+      "Bash(pytest*)",
+      "Bash(powershell*)",
+      "Bash(*pio.exe*)"
     ],
     "deny": [
       "Bash(git merge*)",

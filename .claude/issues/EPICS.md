@@ -21,3 +21,4 @@ ESP32-S3 jako terminal sprzętowy: zbiera audio z mikrofonu I2S, wysyła przez W
 - [x] ISSUE-014 Kamera ESP32 — inicjalizacja OV3660, stream JPEG do brain
 - [x] ISSUE-015 Rozpoznawanie twarzy Igora w brain → "siema mordo" na ekranie
 - [x] ISSUE-016 Widok kamery na LCD — carousel WIFI←MAIN→CAMERA swipe, 5fps
+- [ ] ISSUE-018 Gemini trigger przy rozpoznaniu twarzy — wizja, powitanie w terminalu

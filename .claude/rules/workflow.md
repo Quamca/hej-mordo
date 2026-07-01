@@ -17,7 +17,7 @@ Wszystko inne czyta tylko gdy wprost potrzebne.
 ## Orientacja w projekcie
 
 Na początku każdej sesji Claude Code czyta `CURRENT_STATE.md` w katalogu głównym.
-**Przed zakończeniem każdej sesji** Claude Code MUSI zaktualizować `CURRENT_STATE.md` i zcommitować — nawet jeśli Igor nie przypomni.
+**Przed zakończeniem każdej sesji** Claude Code MUSI zaktualizować `CURRENT_STATE.md` i `EPICS.md` i zcommitować — nawet jeśli Igor nie przypomni.
 Przy zerwaniu sesji — powiedz "gdzie skończyliśmy" a Claude Code przeczyta plik i wróci do kontekstu.
 
 ```
@@ -35,7 +35,9 @@ pomysł / bug / zadanie
 `planned` → `in-progress` → `done`
 
 Pliki issue żyją w `{issues}/` przez cały cykl.
-Po zamknięciu: zmień `status: done` w pliku. Nie przenoś.
+Po zamknięciu: zmień `status: done` w pliku. Nie przenoś. Zaktualizuj też `EPICS.md` (zaznacz `[x]`).
+
+Każdy issue MUSI mieć sekcję `## Problemy i rozwiązania` — dopisuj na bieżąco gdy coś nie działa i jak to naprawiliśmy. To jest najcenniejsza wiedza, która ginie między sesjami.
 
 **Epic** = kontener dla powiązanych issues. Żyje wyłącznie w `{issues}/EPICS.md` jako sekcja — bez osobnego pliku.
 Zamykamy epic gdy wszystkie jego sub-issues są `done` (zmieniamy `[in-progress]` na `[done]` w EPICS.md).
