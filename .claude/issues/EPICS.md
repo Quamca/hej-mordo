@@ -28,3 +28,17 @@ ESP32-S3 jako terminal sprzętowy: zbiera audio z mikrofonu I2S, wysyła przez W
 - [x] ISSUE-015 Rozpoznawanie twarzy Igora w brain → "siema mordo" na ekranie
 - [x] ISSUE-016 Widok kamery na LCD — carousel WIFI←MAIN→CAMERA swipe, 5fps
 - [ ] ISSUE-018 Gemini trigger przy rozpoznaniu twarzy — wizja, powitanie w terminalu
+
+---
+
+## EPIC-3 — Zadania Igora (Google Drive + głos) [in-progress]
+
+Mordo pamięta zadania Igora między sesjami (Google Drive), zarządza nimi głosem (dodawanie/edycja/
+usuwanie/odhaczanie), i docelowo pomaga w planowaniu/dekompozycji/estymacji.
+Świadome przeskoczenie kolejności faz (to Faza 2 "Pamięć" z `project-config.md`, Faza 1 hardware
+jeszcze nie zamknięta) — decyzja Igora.
+
+- [ ] ISSUE-022 Google OAuth setup (Drive API) — autoryzacja, zapis/odświeżanie tokenu
+- [ ] ISSUE-023 Magazyn zadań na Google Drive — format pliku, odczyt/zapis
+- [ ] ISSUE-024 Zarządzanie zadaniami głosem — dodawanie/edycja/usuwanie/odhaczanie/lista (function-calling)
+- [ ] ISSUE-025 Zasady planowania/dekompozycji/estymacji — instrukcje w system prompcie
