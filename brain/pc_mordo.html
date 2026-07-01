@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Mordo</title>
+<style>
+  body { background:#1a1a1a; color:#ccc; font-family: sans-serif; display:flex; flex-direction:column; align-items:center; padding-top:40px; }
+  #startBtn { padding: 12px 24px; font-size:16px; cursor:pointer; }
+  .row { display:flex; align-items:center; gap:10px; margin:8px 0; width:260px; }
+  .label { width:50px; color:#888; }
+  #micBarWrap { flex:1; height:16px; background:#333; }
+  #micBar { height:16px; width:0; background:#0a4; }
+  #spkDot { width:14px; height:14px; border-radius:50%; background:#444; }
+</style>
+</head>
+<body>
+<button id="startBtn">Połącz z Mordo</button>
+<div class="row" id="statusRow1" style="display:none">
+  <div class="label">MIC</div>
+  <div id="micBarWrap"><div id="micBar"></div></div>
+</div>
+<div class="row" id="statusRow2" style="display:none">
+  <div class="label">SPEAK</div>
+  <div id="spkDot"></div>
+</div>
+<script>
+const WS_URL = "ws://localhost:8765";
+const MIC_MAX_RMS = 0.05;
+
+let ws, micCtx, playCtx, processor, playCursor = 0;
+let scheduledSources = [];
+
+document.getElementById("startBtn").onclick = start;
+
+async function start() {
+  document.getElementById("startBtn").style.display = "none";
+  document.getElementById("statusRow1").style.display = "flex";
+  document.getElementById("statusRow2").style.display = "flex";
+
+  ws = new WebSocket(WS_URL);
+  ws.binaryType = "arraybuffer";
+  ws.onmessage = onMessage;
+  ws.onopen = () => console.log("[WS] połączono");
+  ws.onclose = () => console.log("[WS] rozłączono");
+
+  playCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+  playCursor = playCtx.currentTime;
+
+  micCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+  const micStream = await navigator.mediaDevices.getUserMedia({
+    audio: { channelCount: 1, sampleRate: 16000 },
+  });
+  const source = micCtx.createMediaStreamSource(micStream);
+  processor = micCtx.createScriptProcessor(1024, 1, 1);
+  processor.onaudioprocess = onAudioProcess;
+
+  // ScriptProcessorNode musi być podłączony do destination żeby odpalać callback,
+  // ale gain=0 żeby nie było echo mikrofonu w głośnikach.
+  const silentGain = micCtx.createGain();
+  silentGain.gain.value = 0;
+  source.connect(processor);
+  processor.connect(silentGain);
+  silentGain.connect(micCtx.destination);
+}
+
+function onAudioProcess(e) {
+  const input = e.inputBuffer.getChannelData(0);
+  let sumSquares = 0;
+  const pcm16 = new Int16Array(input.length);
+  for (let i = 0; i < input.length; i++) {
+    const s = Math.max(-1, Math.min(1, input[i]));
+    pcm16[i] = s * 32767;
+    sumSquares += s * s;
+  }
+  const rms = Math.sqrt(sumSquares / input.length);
+  document.getElementById("micBar").style.width = Math.min(100, (rms / MIC_MAX_RMS) * 100) + "%";
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(pcm16.buffer);
+  }
+}
+
+function onMessage(e) {
+  if (typeof e.data === "string") {
+    if (e.data === "STOP") {
+      for (const src of scheduledSources) {
+        try { src.stop(0); } catch (_) {}
+      }
+      scheduledSources = [];
+      playCursor = playCtx.currentTime;
+    } else if (e.data.startsWith("STATE:")) {
+      const state = e.data.split(":")[1];
+      document.getElementById("spkDot").style.background = state === "speak" ? "#0c4" : "#444";
+    }
+    return;
+  }
+  playChunk(e.data);
+}
+
+function playChunk(arrayBuffer) {
+  const pcm16 = new Int16Array(arrayBuffer);
+  const float32 = new Float32Array(pcm16.length);
+  for (let i = 0; i < pcm16.length; i++) float32[i] = pcm16[i] / 32768;
+
+  const buffer = playCtx.createBuffer(1, float32.length, 24000);
+  buffer.copyToChannel(float32, 0);
+
+  const src = playCtx.createBufferSource();
+  src.buffer = buffer;
+  src.connect(playCtx.destination);
+
+  const startAt = Math.max(playCursor, playCtx.currentTime);
+  src.start(startAt);
+  playCursor = startAt + buffer.duration;
+  scheduledSources.push(src);
+  src.onended = () => {
+    scheduledSources = scheduledSources.filter((s) => s !== src);
+  };
+}
+</script>
+</body>
+</html>

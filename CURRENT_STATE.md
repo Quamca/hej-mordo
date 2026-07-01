@@ -1,7 +1,7 @@
 # Mordo — Stan Projektu
 
 ## Aktualna faza
-Faza 1 — Hardware Mordo (ESP32-S3)
+Faza 0 — Software Mordo (laptop) — EPIC-1 w toku
 
 ## Co jest zrobione
 - Struktura projektu i agenci Claude Code
@@ -22,7 +22,10 @@ Problem: luzy na stykach MAX98357A — audio I2S wrażliwe na przerwy.
 Wrócimy gdy Igor przylutuje moduł. Przy lutowaniu zmienić piny głośnika (konflikt z ekranem na D7/D8).
 
 ## Co teraz
-ISSUE-018 — Gemini odpala się gdy Mordo rozpozna Igora, dostaje klatki kamery (wizja), wita go tekstem w terminalu. W 100% brain-side (Python na PC).
+ISSUE-019 — PC audio przez przeglądarkę (`brain/pc_mordo.html` + istniejący `main.py`/`ws_server.py`).
+Mikrofon, głośnik i barge-in działają. Zostało: potwierdzić że Ctrl+C w `main.py` czysto kończy sesję.
+Natywne audio (sounddevice + tkinter) porzucone — twardy crash Windows przy mikrofon+głośnik+GUI
+jednocześnie (szczegóły w ISSUE-019 → Problemy i rozwiązania). Po zamknięciu → ISSUE-020 (kamera laptopa).
 
 ## ISSUE-011 — wstrzymany (czeka na lutowanie)
 Implementacja gotowa (firmware + brain + test_speaker.py).
@@ -33,4 +36,6 @@ Wrócimy gdy Igor przylutuje moduł. Przy lutowaniu zmienić piny głośnika (ko
 https://github.com/Quamca/hej-mordo (publiczne)
 
 ## Ostatnia sesja
-2026-06-28 — debug ekranu (cold boot czarny). Poprzednia sesja: downgrade espressif32 @ 6.7.0 naprawił cold boot, ale po kolejnym odłączeniu ekran znów nie działa. Diagnoza w toku.
+2026-07-01 — ISSUE-019: natywne audio (sounddevice+tkinter) crashowało twardo (Windows 0xc0000005),
+izolacja przez eliminację, przejście na przeglądarkę + istniejący ws_server.py. Mikrofon/głośnik/barge-in
+potwierdzone działające.

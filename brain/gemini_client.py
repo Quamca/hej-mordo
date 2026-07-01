@@ -4,7 +4,7 @@ from google.genai import types
 
 from config import GEMINI_API_KEY, GEMINI_MODEL, SYSTEM_PROMPT
 from audio import player_open, player_write, player_stop, player_abort
-from ws_server import audio_queue, clear_queue, enqueue_state
+from ws_server import audio_queue as _ws_audio_queue, clear_queue as _ws_clear_queue, enqueue_state
 
 _client = genai.Client(
     api_key=GEMINI_API_KEY,
@@ -23,7 +23,7 @@ _live_config = types.LiveConnectConfig(
 )
 
 
-async def _send_audio(session) -> None:
+async def _send_audio(session, audio_queue) -> None:
     while True:
         chunk = await audio_queue.get()
         await session.send_realtime_input(
@@ -31,11 +31,12 @@ async def _send_audio(session) -> None:
         )
 
 
-async def _receive_audio(session) -> None:
+async def _receive_audio(session, clear_queue, on_state,
+                         player_open, player_write, player_stop, player_abort) -> None:
     loop = asyncio.get_event_loop()
     while True:
         stream_open = False
-        enqueue_state("listen")
+        on_state("listen")
         async for response in session.receive():
             if not response.server_content:
                 continue
@@ -43,7 +44,7 @@ async def _receive_audio(session) -> None:
             if sc.interrupted:
                 await loop.run_in_executor(None, player_abort)
                 clear_queue()
-                enqueue_state("listen")
+                on_state("listen")
                 stream_open = False
                 break
             if sc.model_turn:
@@ -51,22 +52,30 @@ async def _receive_audio(session) -> None:
                     if part.inline_data:
                         if not stream_open:
                             await loop.run_in_executor(None, player_open)
-                            enqueue_state("speak")
+                            on_state("speak")
                             stream_open = True
                         await loop.run_in_executor(None, player_write, part.inline_data.data)
             if sc.turn_complete:
                 await loop.run_in_executor(None, player_stop)
                 clear_queue()
-                enqueue_state("listen")
+                on_state("listen")
                 stream_open = False
 
 
-async def run() -> None:
+async def run(audio_queue=None, clear_queue=None, on_state=None,
+              player_open=player_open, player_write=player_write,
+              player_stop=player_stop, player_abort=player_abort) -> None:
+    audio_queue = audio_queue if audio_queue is not None else _ws_audio_queue
+    clear_queue = clear_queue if clear_queue is not None else _ws_clear_queue
+    on_state = on_state if on_state is not None else enqueue_state
     while True:
         try:
             async with _client.aio.live.connect(model=GEMINI_MODEL, config=_live_config) as session:
-                send_task = asyncio.create_task(_send_audio(session))
-                recv_task = asyncio.create_task(_receive_audio(session))
+                send_task = asyncio.create_task(_send_audio(session, audio_queue))
+                recv_task = asyncio.create_task(_receive_audio(
+                    session, clear_queue, on_state,
+                    player_open, player_write, player_stop, player_abort,
+                ))
                 try:
                     done, pending = await asyncio.wait(
                         {send_task, recv_task},
