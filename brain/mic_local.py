@@ -1,14 +1,18 @@
 """Mikrofon laptopa — capture 16kHz PCM → asyncio.Queue."""
 import asyncio
+import numpy as np
 import sounddevice as sd
 
 from config import MIC_SAMPLE_RATE, MIC_CHUNK_SIZE
 
 audio_queue: asyncio.Queue = asyncio.Queue()
+current_rms: float = 0.0
 _loop: asyncio.AbstractEventLoop | None = None
 
 
 def _callback(indata, frames, time, status) -> None:
+    global current_rms
+    current_rms = float(np.sqrt(np.mean(indata.astype(np.float32) ** 2)))
     if _loop:
         _loop.call_soon_threadsafe(audio_queue.put_nowait, bytes(indata))
 
