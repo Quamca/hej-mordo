@@ -1,4 +1,4 @@
-"""Rozpoznawanie twarzy Igora — InsightFace embeddings + cv2 preview."""
+"""Rozpoznawanie twarzy Igora — InsightFace embeddings, podgląd w przeglądarce."""
 
 import os
 import queue
@@ -14,6 +14,7 @@ _SIM_THRESHOLD = 0.35
 _TIMEOUT_S = 3.0
 
 _frame_q: queue.Queue = queue.Queue(maxsize=2)
+_photo_requested = threading.Event()
 
 
 def put_frame(data: bytes) -> None:
@@ -26,6 +27,10 @@ def put_frame(data: bytes) -> None:
         _frame_q.put_nowait(data)
     except queue.Full:
         pass
+
+
+def request_photo() -> None:
+    _photo_requested.set()
 
 
 def _normed(embedding: np.ndarray) -> np.ndarray:
@@ -51,14 +56,19 @@ def _load_refs(app) -> list:
     return refs
 
 
-def _is_igor(embedding: np.ndarray, refs: list) -> bool:
+def _igor_similarity(embedding: np.ndarray, refs: list) -> float:
     emb = _normed(embedding)
-    return any(np.dot(emb, r) > _SIM_THRESHOLD for r in refs)
+    return max((np.dot(emb, r) for r in refs), default=0.0)
 
 
 def _send_state(state: str) -> None:
     from ws_server import enqueue_state
     enqueue_state(state)
+
+
+def _send_face_box(payload: str) -> None:
+    from ws_server import enqueue_face_box
+    enqueue_face_box(payload)
 
 
 def _face_thread(loop) -> None:
@@ -77,7 +87,7 @@ def _face_thread(loop) -> None:
     existing = [f for f in os.listdir(_FACES_DIR) if f.lower().endswith(".jpg")] if os.path.isdir(_FACES_DIR) else []
     photo_n = len(existing)
 
-    print("[FACE] podgląd aktywny — 'd' = zrób zdjęcie referencyjne")
+    print("[FACE] rozpoznawanie aktywne — zdjęcie referencyjne przez przycisk w przeglądarce")
 
     while True:
         try:
@@ -86,7 +96,6 @@ def _face_thread(loop) -> None:
             if igor_active and time.time() - last_igor_ts > _TIMEOUT_S:
                 igor_active = False
                 loop.call_soon_threadsafe(_send_state, "listen")
-            cv2.waitKey(1)
             continue
 
         frame_count += 1
@@ -95,36 +104,41 @@ def _face_thread(loop) -> None:
         if img is None:
             continue
 
-        # InsightFace co 5. klatkę — detekcja + rozpoznawanie
-        if frame_count % 5 == 0:
-            faces = app.get(img)
-            for face in faces:
-                igor = refs and _is_igor(face.embedding, refs)
-                color = (0, 200, 0) if igor else (0, 0, 200)
-                x1, y1, x2, y2 = face.bbox.astype(int)
-                cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
-                label = "Igor" if igor else "?"
-                cv2.putText(img, label, (x1, y1 - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
-                if igor:
-                    last_igor_ts = time.time()
-                    if not igor_active:
-                        igor_active = True
-                        loop.call_soon_threadsafe(_send_state, "face")
-
-        # Timeout — twarz zniknęła >3s
-        if igor_active and time.time() - last_igor_ts > _TIMEOUT_S:
-            igor_active = False
-            loop.call_soon_threadsafe(_send_state, "listen")
-
-        cv2.imshow("Mordo — kamera", img)
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord("d"):
+        if _photo_requested.is_set():
+            _photo_requested.clear()
             os.makedirs(_FACES_DIR, exist_ok=True)
             photo_n += 1
             path = os.path.join(_FACES_DIR, f"igor_{photo_n:04d}.jpg")
             cv2.imwrite(path, img)
             print(f"[FACE] zdjecie zapisane: {path}")
             refs = _load_refs(app)
+
+        # InsightFace co 5. klatkę — detekcja + rozpoznawanie
+        if frame_count % 5 == 0:
+            h, w = img.shape[:2]
+            faces = app.get(img)
+            if not faces:
+                loop.call_soon_threadsafe(_send_face_box, "none")
+            for face in faces:
+                sim = _igor_similarity(face.embedding, refs) if refs else 0.0
+                igor = sim > _SIM_THRESHOLD
+                label = "Igor" if igor else "?"
+                x1, y1, x2, y2 = face.bbox.astype(int)
+                nx1, ny1, nx2, ny2 = x1 / w, y1 / h, x2 / w, y2 / h
+                loop.call_soon_threadsafe(
+                    _send_face_box, f"{nx1:.3f},{ny1:.3f},{nx2:.3f},{ny2:.3f},{label}"
+                )
+                if igor:
+                    last_igor_ts = time.time()
+                    if not igor_active:
+                        igor_active = True
+                        print(f"[FACE] Igor rozpoznany ({sim:.2f})")
+                        loop.call_soon_threadsafe(_send_state, "face")
+
+        # Timeout — twarz zniknęła >3s
+        if igor_active and time.time() - last_igor_ts > _TIMEOUT_S:
+            igor_active = False
+            loop.call_soon_threadsafe(_send_state, "listen")
 
 
 def start(loop) -> None:

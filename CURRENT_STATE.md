@@ -22,10 +22,13 @@ Problem: luzy na stykach MAX98357A — audio I2S wrażliwe na przerwy.
 Wrócimy gdy Igor przylutuje moduł. Przy lutowaniu zmienić piny głośnika (konflikt z ekranem na D7/D8).
 
 ## Co teraz
-ISSUE-019 done — PC audio przez przeglądarkę (`brain/pc_mordo.html` + istniejący `main.py`/`ws_server.py`).
-Mikrofon, głośnik, barge-in i czyste zamknięcie (Ctrl+C) potwierdzone. Natywne audio (sounddevice+tkinter)
-porzucone — twardy crash Windows przy mikrofon+głośnik+GUI jednocześnie (szczegóły w ISSUE-019 → Problemy
-i rozwiązania). Next: ISSUE-020 (kamera laptopa + face recognition).
+ISSUE-019 i ISSUE-020 done — `pc_mordo.html` to teraz pełny interfejs Mordo na laptopie: mikrofon,
+głośnik, barge-in, kamera z rozpoznawaniem twarzy (ramka+etykieta w przeglądarce), przycisk zdjęcia
+referencyjnego. Backend (`main.py`/`ws_server.py`/`face.py`/`gemini_client.py`) niezmieniony względem
+architektury ESP32 — przeglądarka to po prostu kolejny klient WebSocket.
+Natywne audio (sounddevice+tkinter) porzucone — twardy crash Windows przy mikrofon+głośnik+GUI
+jednocześnie (szczegóły w ISSUE-019 → Problemy i rozwiązania).
+Next: ISSUE-021 (auto-trigger: rozpoznanie Igora → "Siema mordo" → rozmowa lub dismiss).
 
 ## ISSUE-011 — wstrzymany (czeka na lutowanie)
 Implementacja gotowa (firmware + brain + test_speaker.py).

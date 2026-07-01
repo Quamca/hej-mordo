@@ -23,14 +23,25 @@
   <div class="label">SPEAK</div>
   <div id="spkDot"></div>
 </div>
+<div id="camWrap" style="position:relative; display:none; margin-top:10px;">
+  <video id="camPreview" width="320" height="240" autoplay muted playsinline></video>
+  <canvas id="faceOverlay" width="320" height="240" style="position:absolute; top:0; left:0; pointer-events:none;"></canvas>
+</div>
+<button id="photoBtn" style="display:none; margin-top:8px;">Zrób zdjęcie referencyjne</button>
+<canvas id="camCanvas" width="320" height="240" style="display:none;"></canvas>
 <script>
 const WS_URL = "ws://localhost:8765";
 const MIC_MAX_RMS = 0.05;
+const CAM_HEADER = new Uint8Array([0x43, 0x41, 0x4d, 0x00]); // "CAM\0"
+const CAM_FPS = 5;
 
 let ws, micCtx, playCtx, processor, playCursor = 0;
 let scheduledSources = [];
 
 document.getElementById("startBtn").onclick = start;
+document.getElementById("photoBtn").onclick = () => {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send("PHOTO");
+};
 
 async function start() {
   document.getElementById("startBtn").style.display = "none";
@@ -61,6 +72,34 @@ async function start() {
   source.connect(processor);
   processor.connect(silentGain);
   silentGain.connect(micCtx.destination);
+
+  await startCamera();
+}
+
+async function startCamera() {
+  const video = document.getElementById("camPreview");
+  const canvas = document.getElementById("camCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const camStream = await navigator.mediaDevices.getUserMedia({
+    video: { width: 320, height: 240 },
+  });
+  video.srcObject = camStream;
+  document.getElementById("camWrap").style.display = "block";
+  document.getElementById("photoBtn").style.display = "block";
+
+  setInterval(() => {
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const jpegBytes = new Uint8Array(await blob.arrayBuffer());
+      const frame = new Uint8Array(CAM_HEADER.length + jpegBytes.length);
+      frame.set(CAM_HEADER, 0);
+      frame.set(jpegBytes, CAM_HEADER.length);
+      ws.send(frame.buffer);
+    }, "image/jpeg", 0.7);
+  }, 1000 / CAM_FPS);
 }
 
 function onAudioProcess(e) {
@@ -90,10 +129,33 @@ function onMessage(e) {
     } else if (e.data.startsWith("STATE:")) {
       const state = e.data.split(":")[1];
       document.getElementById("spkDot").style.background = state === "speak" ? "#0c4" : "#444";
+    } else if (e.data.startsWith("FACE:")) {
+      drawFaceBox(e.data.slice(5));
     }
     return;
   }
   playChunk(e.data);
+}
+
+function drawFaceBox(payload) {
+  const canvas = document.getElementById("faceOverlay");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (payload === "none") return;
+
+  const [nx1, ny1, nx2, ny2, label] = payload.split(",");
+  const x1 = parseFloat(nx1) * canvas.width;
+  const y1 = parseFloat(ny1) * canvas.height;
+  const x2 = parseFloat(nx2) * canvas.width;
+  const y2 = parseFloat(ny2) * canvas.height;
+  const igor = label === "Igor";
+
+  ctx.strokeStyle = igor ? "#0c4" : "#c00";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+  ctx.fillStyle = igor ? "#0c4" : "#c00";
+  ctx.font = "14px sans-serif";
+  ctx.fillText(label, x1, y1 - 4);
 }
 
 function playChunk(arrayBuffer) {
