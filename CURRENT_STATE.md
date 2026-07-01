@@ -22,11 +22,7 @@ Problem: luzy na stykach MAX98357A — audio I2S wrażliwe na przerwy.
 Wrócimy gdy Igor przylutuje moduł. Przy lutowaniu zmienić piny głośnika (konflikt z ekranem na D7/D8).
 
 ## Co teraz
-ISSUE-020 — Kamera laptopa + face recognition + zdjęcie referencyjne.
-ISSUE-019 done: pc_mordo.py działa, Gemini odpowiada przez głośniki, okienko MIC/SPEAK.
-
-### Nierozwiązane przed ISSUE-020
-pc_mordo.py czasem nie startuje poprawnie (okno znika). Przyczyna: prawdopodobnie GEMINI_API_KEY nie ustawiony w sesji PowerShell. Diagnoza: `echo $env:GEMINI_API_KEY` przed uruchomieniem.
+ISSUE-018 — Gemini odpala się gdy Mordo rozpozna Igora, dostaje klatki kamery (wizja), wita go tekstem w terminalu. W 100% brain-side (Python na PC).
 
 ## ISSUE-011 — wstrzymany (czeka na lutowanie)
 Implementacja gotowa (firmware + brain + test_speaker.py).
