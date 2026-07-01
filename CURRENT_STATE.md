@@ -1,7 +1,7 @@
 # Mordo — Stan Projektu
 
 ## Aktualna faza
-Faza 0 — Software Mordo (laptop) — EPIC-1 done
+Faza 0 done (EPIC-1) — w trakcie EPIC-3 (Faza 2 "Pamięć", świadomie przed Fazą 1 hardware)
 
 ## Co jest zrobione
 - Struktura projektu i agenci Claude Code
@@ -19,6 +19,7 @@ Faza 0 — Software Mordo (laptop) — EPIC-1 done
 - ISSUE-020: Kamera laptopa w przeglądarce — rozpoznawanie twarzy (ramka+etykieta), zdjęcie referencyjne.
 - ISSUE-021: Auto-trigger — rozpoznanie Igora → powitanie Gemini → rozmowa lub dismiss (30s cooldown).
 - ISSUE-003: Wake word "Hej Mordo" — Vosk offline (PL), aktywacja głosowa pomija cooldown dismissu.
+- ISSUE-022: Google OAuth (Drive API) — `gdrive_auth.py`, token odświeżany automatycznie bez re-loginu.
 
 ## ISSUE-011 — wstrzymany (czeka na lutowanie)
 Implementacja gotowa (firmware + brain + test_speaker.py).
@@ -38,8 +39,12 @@ jednocześnie (szczegóły w ISSUE-019 → Problemy i rozwiązania).
 Model Vosk PL (~50MB) w `brain/data/vosk-model-pl/` — gitignored, do ściągnięcia ręcznie na nowej
 maszynie: https://alphacephei.com/vosk/models/vosk-model-small-pl-0.22.zip
 
-Next: EPIC-2 (Hardware Mordo Faza 1) — zostały ISSUE-011 (głośnik ESP32, czeka na lutowanie) i
-ISSUE-018 (Gemini trigger przy rozpoznaniu twarzy na ESP32).
+EPIC-3 (Zadania Igora, Google Drive + głos) w toku: ISSUE-022 done — OAuth działa
+(`brain/gdrive_auth.py`, `brain/credentials.json` + `brain/data/token.json` gitignored).
+
+Co teraz: ISSUE-023 (magazyn zadań na Drive — format pliku, odczyt/zapis).
+Next po EPIC-3: ISSUE-023→024→025, potem EPIC-2 (Hardware Mordo Faza 1) — ISSUE-011 (głośnik ESP32,
+czeka na lutowanie) i ISSUE-018 (Gemini trigger przy rozpoznaniu twarzy na ESP32).
 
 ## ISSUE-011 — wstrzymany (czeka na lutowanie)
 Implementacja gotowa (firmware + brain + test_speaker.py).
@@ -56,3 +61,6 @@ kamera laptopa w przeglądarce, rozpoznawanie twarzy bez osobnego okna cv2. ISSU
 powitania + dismiss przez function-call Gemini — po drodze bug (zgubiona pętla `while True` w
 `_receive_audio` powodowała zapętlone powitania), znaleziony przez logi per-tura. ISSUE-003: wake word
 "Hej Mordo" przez Vosk offline (PL) — ws_server.py rozsyła audio do wielu odbiorców (audio_callbacks).
+Ustalono stały głos Gemini (Puck). Zaplanowano EPIC-3 (zadania Igora, Google Drive + głos) —
+ISSUE-022 done: OAuth do Google Drive (`gdrive_auth.py`), Igor ręcznie założył projekt w GCP
+i włączył Drive API.

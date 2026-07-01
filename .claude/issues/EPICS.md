@@ -38,7 +38,7 @@ usuwanie/odhaczanie), i docelowo pomaga w planowaniu/dekompozycji/estymacji.
 Świadome przeskoczenie kolejności faz (to Faza 2 "Pamięć" z `project-config.md`, Faza 1 hardware
 jeszcze nie zamknięta) — decyzja Igora.
 
-- [ ] ISSUE-022 Google OAuth setup (Drive API) — autoryzacja, zapis/odświeżanie tokenu
+- [x] ISSUE-022 Google OAuth setup (Drive API) — autoryzacja, zapis/odświeżanie tokenu
 - [ ] ISSUE-023 Magazyn zadań na Google Drive — format pliku, odczyt/zapis
 - [ ] ISSUE-024 Zarządzanie zadaniami głosem — dodawanie/edycja/usuwanie/odhaczanie/lista (function-calling)
 - [ ] ISSUE-025 Zasady planowania/dekompozycji/estymacji — instrukcje w system prompcie

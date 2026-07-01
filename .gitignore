@@ -15,3 +15,5 @@ firmware/include/secrets.h
 brain/.env
 brain/mordo.log
 brain/data/vosk-model-pl/
+brain/credentials.json
+brain/data/token.json
