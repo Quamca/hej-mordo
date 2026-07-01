@@ -4,8 +4,9 @@ import sys
 
 from config import GEMINI_API_KEY
 from gemini_client import run_triggered
-from ws_server import start as start_ws, frame_callbacks, photo_callbacks
+from ws_server import start as start_ws, frame_callbacks, photo_callbacks, audio_callbacks
 import face
+import wake_word
 
 
 class _Tee:
@@ -40,7 +41,9 @@ def main() -> None:
         loop = asyncio.get_event_loop()
         frame_callbacks.append(face.put_frame)
         photo_callbacks.append(face.request_photo)
+        audio_callbacks.append(wake_word.put_audio)
         face.start(loop)
+        wake_word.start(loop)
         await asyncio.gather(start_ws(), run_triggered())
 
     try:

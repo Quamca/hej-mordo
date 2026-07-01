@@ -16,6 +16,7 @@ frame_queue: asyncio.Queue = asyncio.Queue(maxsize=2)  # tylko najnowsze klatki
 outgoing_queue: asyncio.Queue = asyncio.Queue()
 frame_callbacks: list = []  # rejestrowane przez moduły (np. face.py)
 photo_callbacks: list = []  # rejestrowane przez moduły (np. face.py) — komenda "zrób zdjęcie"
+audio_callbacks: list = []  # rejestrowane przez moduły (np. wake_word.py) — kopia każdego audio chunku
 _debug_frame_saved = False
 _loop: asyncio.AbstractEventLoop | None = None
 
@@ -45,6 +46,8 @@ async def handle(websocket):
                     _handle_frame(frame)
                 else:
                     await audio_queue.put(message)
+                    for cb in audio_callbacks:
+                        cb(message)
                     chunks += 1
                     print(f"[WS] chunk #{chunks}: {len(message)}B", end="\r")
             elif message == "PHOTO":

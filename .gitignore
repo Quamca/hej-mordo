@@ -14,3 +14,4 @@ firmware/include/secrets.h
 .claude/settings.local.json
 brain/.env
 brain/mordo.log
+brain/data/vosk-model-pl/

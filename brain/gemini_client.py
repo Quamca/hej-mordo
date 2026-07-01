@@ -57,6 +57,14 @@ def signal_igor_present() -> None:
         _trigger_event.set()
 
 
+def signal_wake_word() -> None:
+    """Świadoma komenda głosowa — pomija cooldown po dismissie."""
+    global _last_dismiss_ts
+    _last_dismiss_ts = 0.0
+    if _trigger_event:
+        _trigger_event.set()
+
+
 async def _send_audio(session, audio_queue) -> None:
     while True:
         chunk = await audio_queue.get()

@@ -8,6 +8,7 @@ Mikrofon + głośniki laptopa, kamera laptopa, rozpoznawanie twarzy, auto-trigge
 - [x] ISSUE-019 PC audio — rozmowa z Gemini przez mic + głośniki laptopa (przeglądarka)
 - [x] ISSUE-020 Kamera laptopa — face recognition + zdjęcie referencyjne z przeglądarki
 - [x] ISSUE-021 Auto-trigger — rozpoznanie Igora → powitanie → rozmowa lub dismiss (30s cooldown)
+- [x] ISSUE-003 Wake word "Hej Mordo" — Vosk offline, aktywacja głosowa niezależna od twarzy
 
 ---
 
