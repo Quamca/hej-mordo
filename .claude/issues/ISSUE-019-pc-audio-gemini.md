@@ -1,6 +1,6 @@
 ---
 title: "ISSUE-019: PC audio — rozmowa z Gemini przez mikrofon i głośniki laptopa"
-status: in-progress
+status: done
 type: issue
 faza: 0
 epic: EPIC-1
@@ -27,7 +27,7 @@ Zero zmian w backendzie — `ws_server.py`, `audio.py`, `gemini_client.py`, `mai
 - [x] Mikrofon laptopa (przez przeglądarkę, `getUserMedia`) wysyła audio do Gemini
 - [x] Głośniki laptopa (przez przeglądarkę, Web Audio API) odtwarzają odpowiedź Gemini w czasie rzeczywistym
 - [x] Gemini nie przerywa sam siebie (barge-in działa płynnie — Igor może przerywać Gemini)
-- [ ] Ctrl+C w `main.py` czysto kończy sesję (do potwierdzenia)
+- [x] Ctrl+C w `main.py` czysto kończy sesję
 
 ## Notatki
 

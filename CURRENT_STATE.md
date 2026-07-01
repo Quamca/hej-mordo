@@ -22,10 +22,10 @@ Problem: luzy na stykach MAX98357A — audio I2S wrażliwe na przerwy.
 Wrócimy gdy Igor przylutuje moduł. Przy lutowaniu zmienić piny głośnika (konflikt z ekranem na D7/D8).
 
 ## Co teraz
-ISSUE-019 — PC audio przez przeglądarkę (`brain/pc_mordo.html` + istniejący `main.py`/`ws_server.py`).
-Mikrofon, głośnik i barge-in działają. Zostało: potwierdzić że Ctrl+C w `main.py` czysto kończy sesję.
-Natywne audio (sounddevice + tkinter) porzucone — twardy crash Windows przy mikrofon+głośnik+GUI
-jednocześnie (szczegóły w ISSUE-019 → Problemy i rozwiązania). Po zamknięciu → ISSUE-020 (kamera laptopa).
+ISSUE-019 done — PC audio przez przeglądarkę (`brain/pc_mordo.html` + istniejący `main.py`/`ws_server.py`).
+Mikrofon, głośnik, barge-in i czyste zamknięcie (Ctrl+C) potwierdzone. Natywne audio (sounddevice+tkinter)
+porzucone — twardy crash Windows przy mikrofon+głośnik+GUI jednocześnie (szczegóły w ISSUE-019 → Problemy
+i rozwiązania). Next: ISSUE-020 (kamera laptopa + face recognition).
 
 ## ISSUE-011 — wstrzymany (czeka na lutowanie)
 Implementacja gotowa (firmware + brain + test_speaker.py).
