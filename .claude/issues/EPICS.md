@@ -39,6 +39,6 @@ usuwanie/odhaczanie), i docelowo pomaga w planowaniu/dekompozycji/estymacji.
 jeszcze nie zamknięta) — decyzja Igora.
 
 - [x] ISSUE-022 Google OAuth setup (Drive API) — autoryzacja, zapis/odświeżanie tokenu
-- [ ] ISSUE-023 Magazyn zadań na Google Drive — format pliku, odczyt/zapis
+- [x] ISSUE-023 Magazyn zadań na Google Drive — format pliku, odczyt/zapis
 - [ ] ISSUE-024 Zarządzanie zadaniami głosem — dodawanie/edycja/usuwanie/odhaczanie/lista (function-calling)
 - [ ] ISSUE-025 Zasady planowania/dekompozycji/estymacji — instrukcje w system prompcie
