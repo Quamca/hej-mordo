@@ -2,7 +2,8 @@ import asyncio
 
 from config import GEMINI_API_KEY
 from gemini_client import run
-from ws_server import start as start_ws, frame_callbacks
+from ws_server import start as start_ws, frame_callbacks, audio_queue, clear_queue, enqueue_state
+from audio import player_open, player_write, player_stop, player_abort
 import face
 
 
@@ -17,7 +18,11 @@ def main() -> None:
         loop = asyncio.get_event_loop()
         frame_callbacks.append(face.put_frame)
         face.start(loop)
-        await asyncio.gather(start_ws(), run())
+        await asyncio.gather(
+            start_ws(),
+            run(audio_queue, clear_queue, enqueue_state,
+                player_open, player_write, player_stop, player_abort),
+        )
 
     try:
         asyncio.run(_main())
