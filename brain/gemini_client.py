@@ -25,9 +25,16 @@ _GREETING_PROMPT = (
     f"i wywołaj funkcję {_END_TOOL_NAME}."
 )
 
+_VOICE_NAME = "Puck"
+
 _greeting_config = types.LiveConnectConfig(
     response_modalities=["AUDIO"],
     system_instruction=SYSTEM_PROMPT + _GREETING_PROMPT,
+    speech_config=types.SpeechConfig(
+        voice_config=types.VoiceConfig(
+            prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=_VOICE_NAME)
+        )
+    ),
     tools=[types.Tool(function_declarations=[
         types.FunctionDeclaration(
             name=_END_TOOL_NAME,
