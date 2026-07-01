@@ -21,6 +21,8 @@ Faza 0 done (EPIC-1) — w trakcie EPIC-3 (Faza 2 "Pamięć", świadomie przed F
 - ISSUE-003: Wake word "Hej Mordo" — Vosk offline (PL), aktywacja głosowa pomija cooldown dismissu.
 - ISSUE-022: Google OAuth (Drive API) — `gdrive_auth.py`, token odświeżany automatycznie bez re-loginu.
 - ISSUE-023: Magazyn zadań na Drive — `tasks_store.py`, plik `mordo_zadania.json`, load/save potwierdzone.
+- ISSUE-024: Zadania głosem — `task_tools.py` (function-calling), + panel zadań w przeglądarce (bonus,
+  poza AC): dodawanie/odhaczanie/edycja/usuwanie ręcznie, lista na żywo przez WebSocket.
 
 ## ISSUE-011 — wstrzymany (czeka na lutowanie)
 Implementacja gotowa (firmware + brain + test_speaker.py).
@@ -40,12 +42,16 @@ jednocześnie (szczegóły w ISSUE-019 → Problemy i rozwiązania).
 Model Vosk PL (~50MB) w `brain/data/vosk-model-pl/` — gitignored, do ściągnięcia ręcznie na nowej
 maszynie: https://alphacephei.com/vosk/models/vosk-model-small-pl-0.22.zip
 
-EPIC-3 (Zadania Igora, Google Drive + głos) w toku: ISSUE-022 (OAuth) i ISSUE-023 (magazyn zadań
-na Drive, `tasks_store.py`) done.
+EPIC-3 (Zadania Igora, Google Drive + głos) w toku: ISSUE-022, 023, 024 wszystkie done.
+`pc_mordo.html`/`pc_mordo.js` (JS wydzielony do osobnego pliku, HTML przekroczył 230 linii) mają teraz
+panel zadań na żywo, oprócz mikrofonu/głośnika/kamery.
+`start_mordo.bat` (katalog główny) — jednym kliknięciem odpala `main.py` (z kluczem z `.env`) i otwiera
+`pc_mordo.html`. Konsola `main.py` na razie zostaje widoczna (Igor zdecydował się nie minimalizować/nie
+zamykać z przeglądarki na razie).
 
-Co teraz: ISSUE-024 (zarządzanie zadaniami głosem — function-calling, wzorzec z `zakoncz_rozmowe`).
-Next po EPIC-3: ISSUE-025 (zasady planowania), potem EPIC-2 (Hardware Mordo Faza 1) — ISSUE-011
-(głośnik ESP32, czeka na lutowanie) i ISSUE-018 (Gemini trigger przy rozpoznaniu twarzy na ESP32).
+Co teraz: ISSUE-025 (zasady planowania/dekompozycji/estymacji — treść do ustalenia z Igorem).
+Next po EPIC-3: EPIC-2 (Hardware Mordo Faza 1) — ISSUE-011 (głośnik ESP32, czeka na lutowanie) i
+ISSUE-018 (Gemini trigger przy rozpoznaniu twarzy na ESP32).
 
 ## ISSUE-011 — wstrzymany (czeka na lutowanie)
 Implementacja gotowa (firmware + brain + test_speaker.py).
@@ -62,6 +68,7 @@ kamera laptopa w przeglądarce, rozpoznawanie twarzy bez osobnego okna cv2. ISSU
 powitania + dismiss przez function-call Gemini — po drodze bug (zgubiona pętla `while True` w
 `_receive_audio` powodowała zapętlone powitania), znaleziony przez logi per-tura. ISSUE-003: wake word
 "Hej Mordo" przez Vosk offline (PL) — ws_server.py rozsyła audio do wielu odbiorców (audio_callbacks).
-Ustalono stały głos Gemini (Puck). Zaplanowano EPIC-3 (zadania Igora, Google Drive + głos) —
-ISSUE-022 done: OAuth do Google Drive (`gdrive_auth.py`), Igor ręcznie założył projekt w GCP
-i włączył Drive API.
+Ustalono stały głos Gemini (Puck). Zaplanowano i zamknięto EPIC-3 core (zadania Igora, Google Drive
++ głos): ISSUE-022 (OAuth, Igor ręcznie założył projekt w GCP i włączył Drive API), ISSUE-023
+(magazyn zadań na Drive), ISSUE-024 (function-calling głosowe + panel zadań w przeglądarce, poza
+pierwotnym AC). Dodano `start_mordo.bat` do jednoklikowego startu.

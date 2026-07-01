@@ -40,5 +40,5 @@ jeszcze nie zamknięta) — decyzja Igora.
 
 - [x] ISSUE-022 Google OAuth setup (Drive API) — autoryzacja, zapis/odświeżanie tokenu
 - [x] ISSUE-023 Magazyn zadań na Google Drive — format pliku, odczyt/zapis
-- [ ] ISSUE-024 Zarządzanie zadaniami głosem — dodawanie/edycja/usuwanie/odhaczanie/lista (function-calling)
+- [x] ISSUE-024 Zarządzanie zadaniami głosem — dodawanie/edycja/usuwanie/odhaczanie/lista (function-calling) + panel w przeglądarce
 - [ ] ISSUE-025 Zasady planowania/dekompozycji/estymacji — instrukcje w system prompcie

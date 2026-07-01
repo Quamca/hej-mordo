@@ -1,6 +1,7 @@
 """WebSocket server: odbiera audio mic i klatki kamery z ESP32, wysyła audio do ESP32."""
 
 import asyncio
+import json
 import os
 import websockets
 import websockets.exceptions
@@ -17,6 +18,8 @@ outgoing_queue: asyncio.Queue = asyncio.Queue()
 frame_callbacks: list = []  # rejestrowane przez moduły (np. face.py)
 photo_callbacks: list = []  # rejestrowane przez moduły (np. face.py) — komenda "zrób zdjęcie"
 audio_callbacks: list = []  # rejestrowane przez moduły (np. wake_word.py) — kopia każdego audio chunku
+task_callbacks: list = []  # rejestrowane przez moduły (np. task_tools.py) — komendy TASK: z przeglądarki
+connect_callbacks: list = []  # wywoływane przy nowym połączeniu (np. wyślij aktualną listę zadań)
 _debug_frame_saved = False
 _loop: asyncio.AbstractEventLoop | None = None
 
@@ -36,6 +39,8 @@ async def _sender(websocket) -> None:
 async def handle(websocket):
     addr = websocket.remote_address
     print(f"[WS] połączono: {addr}")
+    for cb in connect_callbacks:
+        cb()
     sender = asyncio.create_task(_sender(websocket))
     chunks = 0
     try:
@@ -53,6 +58,9 @@ async def handle(websocket):
             elif message == "PHOTO":
                 for cb in photo_callbacks:
                     cb()
+            elif message.startswith("TASK:"):
+                for cb in task_callbacks:
+                    cb(message[5:])
     except websockets.exceptions.ConnectionClosed:
         pass
     finally:
@@ -112,6 +120,12 @@ def enqueue_state(state: str) -> None:
 def enqueue_face_box(payload: str) -> None:
     if _loop:
         _loop.call_soon_threadsafe(outgoing_queue.put_nowait, f"FACE:{payload}")
+
+
+def enqueue_tasks(tasks: list) -> None:
+    if _loop:
+        payload = json.dumps(tasks, ensure_ascii=False)
+        _loop.call_soon_threadsafe(outgoing_queue.put_nowait, f"TASKS:{payload}")
 
 
 def clear_queue() -> None:

@@ -6,6 +6,7 @@ from google.genai import types
 from config import GEMINI_API_KEY, GEMINI_MODEL, SYSTEM_PROMPT
 from audio import player_open, player_write, player_stop, player_abort
 from ws_server import audio_queue as _ws_audio_queue, clear_queue as _ws_clear_queue, enqueue_state
+import task_tools
 
 _client = genai.Client(
     api_key=GEMINI_API_KEY,
@@ -25,11 +26,18 @@ _GREETING_PROMPT = (
     f"i wywołaj funkcję {_END_TOOL_NAME}."
 )
 
+_TASKS_PROMPT = (
+    "\n\nMasz dostęp do listy zadań Igora. Gdy Igor mówi że ma coś do zrobienia, chce dodać, "
+    "zmienić, usunąć zadanie, oznaczyć je jako zrobione, albo pyta co ma do zrobienia — użyj "
+    "odpowiedniej funkcji (dodaj_zadanie, edytuj_zadanie, usun_zadanie, oznacz_zrobione, "
+    "pokaz_zadania) zamiast tylko o tym mówić."
+)
+
 _VOICE_NAME = "Puck"
 
 _greeting_config = types.LiveConnectConfig(
     response_modalities=["AUDIO"],
-    system_instruction=SYSTEM_PROMPT + _GREETING_PROMPT,
+    system_instruction=SYSTEM_PROMPT + _GREETING_PROMPT + _TASKS_PROMPT,
     speech_config=types.SpeechConfig(
         voice_config=types.VoiceConfig(
             prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=_VOICE_NAME)
@@ -40,6 +48,7 @@ _greeting_config = types.LiveConnectConfig(
             name=_END_TOOL_NAME,
             description="Wywołaj gdy Igor da do zrozumienia że nie chce teraz rozmawiać.",
         ),
+        *task_tools.TOOL_DECLARATIONS,
     ])],
     realtime_input_config=types.RealtimeInputConfig(
         automatic_activity_detection=types.AutomaticActivityDetection(
@@ -89,14 +98,25 @@ async def _receive_audio(session, clear_queue, on_state,
         on_state("listen")
         async for response in session.receive():
             if response.tool_call:
+                end_session = False
+                responses = []
                 for fc in response.tool_call.function_calls:
                     if fc.name == _END_TOOL_NAME:
-                        await session.send_tool_response(
-                            function_responses=[types.FunctionResponse(
-                                id=fc.id, name=fc.name, response={"ok": True},
-                            )]
-                        )
-                        return True
+                        end_session = True
+                        responses.append(types.FunctionResponse(
+                            id=fc.id, name=fc.name, response={"ok": True},
+                        ))
+                    elif fc.name in task_tools.HANDLERS:
+                        handler = task_tools.HANDLERS[fc.name]
+                        args = fc.args or {}
+                        result = await loop.run_in_executor(None, lambda: handler(**args))
+                        responses.append(types.FunctionResponse(
+                            id=fc.id, name=fc.name, response=result,
+                        ))
+                if responses:
+                    await session.send_tool_response(function_responses=responses)
+                if end_session:
+                    return True
                 continue
             if not response.server_content:
                 continue

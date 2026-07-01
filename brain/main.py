@@ -4,8 +4,12 @@ import sys
 
 from config import GEMINI_API_KEY
 from gemini_client import run_triggered
-from ws_server import start as start_ws, frame_callbacks, photo_callbacks, audio_callbacks
+from ws_server import (
+    start as start_ws, frame_callbacks, photo_callbacks, audio_callbacks,
+    task_callbacks, connect_callbacks,
+)
 import face
+import task_tools
 import wake_word
 
 
@@ -42,6 +46,8 @@ def main() -> None:
         frame_callbacks.append(face.put_frame)
         photo_callbacks.append(face.request_photo)
         audio_callbacks.append(wake_word.put_audio)
+        task_callbacks.append(task_tools.handle_ws_command)
+        connect_callbacks.append(task_tools.push_current_tasks)
         face.start(loop)
         wake_word.start(loop)
         await asyncio.gather(start_ws(), run_triggered())
