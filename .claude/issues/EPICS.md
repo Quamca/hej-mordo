@@ -1,8 +1,13 @@
 # Epics
 
-## EPIC-1 — Software Mordo Faza 0 [anulowany]
+## EPIC-1 — Software Mordo Faza 0 [in-progress]
 
-Pominięty — części ESP32 dotarły wcześniej niż planowano, przechodzimy bezpośrednio do hardware.
+Pełna wersja Mordo działająca wyłącznie na laptopie — solidna baza przed powrotem do hardware.
+Mikrofon + głośniki laptopa, kamera laptopa, rozpoznawanie twarzy, auto-trigger Gemini.
+
+- [ ] ISSUE-019 PC audio — rozmowa z Gemini przez mic + głośniki laptopa (bez ESP32)
+- [ ] ISSUE-020 Kamera laptopa — face recognition + zdjęcie referencyjne z programu
+- [ ] ISSUE-021 Auto-trigger — rozpoznanie Igora → "Siema mordo" → rozmowa lub dismiss
 
 ---
 
